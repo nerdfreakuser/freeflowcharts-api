@@ -1,0 +1,525 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "FreeFlowCharts API",
+    "description": "Free public API for creating interactive flowcharts programmatically. No API key required. Perfect for AI agents, chatbots, automation scripts, and developer tools.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "FreeFlowCharts",
+      "url": "https://freeflowcharts.app"
+    },
+    "license": {
+      "name": "Free to use",
+      "url": "https://freeflowcharts.app/terms"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://freeflowcharts.app",
+      "description": "Production"
+    }
+  ],
+  "paths": {
+    "/api/create-flowchart": {
+      "post": {
+        "operationId": "createFlowchart",
+        "summary": "Create a flowchart and get a shareable link",
+        "description": "Creates an interactive flowchart from a list of nodes and edges. Returns a permanent shareable URL. No authentication required. Rate limited to 30 requests per hour per IP.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFlowchartRequest"
+              },
+              "example": {
+                "title": "User Signup Flow",
+                "description": "How new users register on our platform",
+                "createdBy": "My AI Agent",
+                "nodes": [
+                  { "id": "1", "type": "start", "label": "User visits site" },
+                  { "id": "2", "type": "process", "label": "Click Sign Up" },
+                  { "id": "3", "type": "io", "label": "Enter email & password" },
+                  { "id": "4", "type": "decision", "label": "Valid input?" },
+                  { "id": "5", "type": "process", "label": "Create account" },
+                  { "id": "6", "type": "end", "label": "Account active" },
+                  { "id": "7", "type": "process", "label": "Show error" }
+                ],
+                "edges": [
+                  { "from": "1", "to": "2" },
+                  { "from": "2", "to": "3" },
+                  { "from": "3", "to": "4" },
+                  { "from": "4", "to": "5", "label": "Yes" },
+                  { "from": "4", "to": "7", "label": "No" },
+                  { "from": "5", "to": "6" },
+                  { "from": "7", "to": "3" }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Flowchart created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateFlowchartResponse"
+                },
+                "example": {
+                  "success": true,
+                  "flowId": "T0IR6bmq93G1nY7fzvHM",
+                  "shareId": "oVAGWBSZClDe8XQY",
+                  "url": "https://freeflowcharts.app/view/oVAGWBSZClDe8XQY",
+                  "embed": "<iframe src=\"https://freeflowcharts.app/view/oVAGWBSZClDe8XQY\" width=\"800\" height=\"600\" frameborder=\"0\"></iframe>",
+                  "branding": "Powered by FreeFlowCharts — https://freeflowcharts.app"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request — missing or invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "missingTitle": {
+                    "summary": "Missing title",
+                    "value": { "error": "title is required (string, max 200 chars)." }
+                  },
+                  "emptyNodes": {
+                    "summary": "Empty nodes array",
+                    "value": { "error": "nodes array is required and must not be empty." }
+                  },
+                  "tooManyNodes": {
+                    "summary": "Too many nodes",
+                    "value": { "error": "Maximum 100 nodes per flowchart." }
+                  },
+                  "tooManyEdges": {
+                    "summary": "Too many edges",
+                    "value": { "error": "Maximum 200 edges per flowchart." }
+                  },
+                  "invalidEdges": {
+                    "summary": "Edges not an array",
+                    "value": { "error": "edges must be an array." }
+                  },
+                  "invalidJson": {
+                    "summary": "Malformed JSON",
+                    "value": { "error": "Invalid JSON body." }
+                  }
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "Method not allowed — use POST",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "Method not allowed. Use POST."
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded — max 30 flowcharts per hour per IP",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "Rate limit exceeded. Max 30 flowcharts per hour."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "example": {
+                  "error": "Internal server error."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/node-types": {
+      "get": {
+        "operationId": "getNodeTypes",
+        "summary": "List all supported node types",
+        "description": "Returns the complete list of supported node types with their descriptions and default colors.",
+        "responses": {
+          "200": {
+            "description": "List of node types",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NodeTypesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/health": {
+      "get": {
+        "operationId": "healthCheck",
+        "summary": "API health check",
+        "description": "Returns the current status of the API.",
+        "responses": {
+          "200": {
+            "description": "API is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/export/json": {
+      "get": {
+        "operationId": "exportJSON",
+        "summary": "Export flowchart as JSON",
+        "description": "Returns the flowchart data as structured JSON including nodes, edges, and metadata.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "description": "The shareId of the flowchart (returned when created via POST /api/create-flowchart)",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "bg",
+            "in": "query",
+            "required": false,
+            "description": "Override background color/gradient for this export. Hex or linear-gradient(...).",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "theme",
+            "in": "query",
+            "required": false,
+            "description": "Override visual theme. One of: default, neon, pastel, retro, ocean, brutalist, candy.",
+            "schema": { "type": "string", "enum": ["default", "neon", "pastel", "retro", "ocean", "brutalist", "candy"] }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "JSON export of the flowchart. Includes stored `theme`/`background` plus `resolvedTheme`/`resolvedBackground` reflecting any query param overrides.",
+            "content": { "application/json": {} }
+          },
+          "400": { "description": "Missing id parameter" },
+          "404": { "description": "Flowchart not found" }
+        }
+      }
+    },
+    "/api/export/mermaid": {
+      "get": {
+        "operationId": "exportMermaid",
+        "summary": "Export flowchart as Mermaid diagram syntax",
+        "description": "Returns the flowchart as Mermaid flowchart syntax (text/plain). Can be pasted into any Mermaid renderer, GitHub markdown, Notion, Obsidian, etc.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "description": "The shareId of the flowchart",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Mermaid diagram syntax",
+            "content": { "text/plain": {} }
+          },
+          "400": { "description": "Missing id parameter" },
+          "404": { "description": "Flowchart not found" }
+        }
+      }
+    },
+    "/api/export/svg": {
+      "get": {
+        "operationId": "exportSVG",
+        "summary": "Export flowchart as SVG image",
+        "description": "Returns a vector SVG rendering of the flowchart with dark theme, colored nodes, labeled edges, and branding.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "description": "The shareId of the flowchart",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "bg",
+            "in": "query",
+            "required": false,
+            "description": "Override background color/gradient",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "theme",
+            "in": "query",
+            "required": false,
+            "description": "Override visual theme",
+            "schema": { "type": "string", "enum": ["default", "neon", "pastel", "retro", "ocean", "brutalist", "candy"] }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "SVG image",
+            "content": { "image/svg+xml": {} }
+          },
+          "400": { "description": "Missing id parameter" },
+          "404": { "description": "Flowchart not found" }
+        }
+      }
+    },
+    "/api/export/png": {
+      "get": {
+        "operationId": "exportPNG",
+        "summary": "Export flowchart as PNG image",
+        "description": "Returns a 1600px-wide PNG rendering of the flowchart. Generated server-side from SVG.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "description": "The shareId of the flowchart",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "bg",
+            "in": "query",
+            "required": false,
+            "description": "Override background color/gradient",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "theme",
+            "in": "query",
+            "required": false,
+            "description": "Override visual theme",
+            "schema": { "type": "string", "enum": ["default", "neon", "pastel", "retro", "ocean", "brutalist", "candy"] }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PNG image",
+            "content": { "image/png": {} }
+          },
+          "400": { "description": "Missing id parameter" },
+          "404": { "description": "Flowchart not found" },
+          "500": { "description": "PNG rendering failed — try SVG instead" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateFlowchartRequest": {
+        "type": "object",
+        "required": ["title", "nodes", "edges"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Flowchart title"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000,
+            "description": "Optional flowchart description"
+          },
+          "createdBy": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Attribution — your agent or app name (shown in the shared view header)"
+          },
+          "nodes": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "description": "Array of flowchart nodes",
+            "items": {
+              "$ref": "#/components/schemas/Node"
+            }
+          },
+          "edges": {
+            "type": "array",
+            "maxItems": 200,
+            "description": "Array of edges connecting nodes. Edges referencing non-existent node IDs are silently dropped.",
+            "items": {
+              "$ref": "#/components/schemas/Edge"
+            }
+          },
+          "background": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "Background color or gradient. Accepts hex color (e.g. #1a1a2e) or CSS linear-gradient (e.g. linear-gradient(135deg, #0f0c29, #302b63, #24243e)). Default: #06040d"
+          },
+          "theme": {
+            "type": "string",
+            "enum": ["default", "neon", "pastel", "retro", "ocean", "brutalist", "candy"],
+            "description": "Visual theme for exports. Each theme changes background, node colors, edge styling, fonts, and overall mood. Default: default"
+          }
+        }
+      },
+      "Node": {
+        "type": "object",
+        "required": ["id", "label"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique node identifier. Must be unique within the flowchart."
+          },
+          "type": {
+            "type": "string",
+            "description": "Node type. Unknown types default to 'process'.",
+            "enum": [
+              "start", "end", "process", "decision", "io", "delay", "subprocess",
+              "task", "bug", "email", "meeting", "approval", "note", "textlabel",
+              "approvalGate", "deadline", "milestone", "handoff", "cost"
+            ],
+            "default": "process"
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Display label shown inside the node"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "Optional description shown below the label"
+          },
+          "x": {
+            "type": "number",
+            "description": "X position in pixels. If omitted, nodes are auto-laid out in a grid."
+          },
+          "y": {
+            "type": "number",
+            "description": "Y position in pixels. If omitted, nodes are auto-laid out in a grid."
+          }
+        }
+      },
+      "Edge": {
+        "type": "object",
+        "required": ["from", "to"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Optional edge identifier. Auto-generated if omitted."
+          },
+          "from": {
+            "type": "string",
+            "description": "Source node ID. Must reference an existing node."
+          },
+          "to": {
+            "type": "string",
+            "description": "Target node ID. Must reference an existing node."
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Optional label shown on the edge (e.g. 'Yes', 'No')"
+          }
+        }
+      },
+      "CreateFlowchartResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Always true on success"
+          },
+          "flowId": {
+            "type": "string",
+            "description": "Firestore document ID"
+          },
+          "shareId": {
+            "type": "string",
+            "description": "Unique share identifier used in the URL"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Permanent shareable link to the interactive flowchart"
+          },
+          "embed": {
+            "type": "string",
+            "description": "Ready-to-use HTML iframe embed code"
+          },
+          "branding": {
+            "type": "string",
+            "description": "Attribution text"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Human-readable error message"
+          }
+        }
+      },
+      "NodeTypesResponse": {
+        "type": "object",
+        "properties": {
+          "types": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": { "type": "string" },
+                "description": { "type": "string" },
+                "color": { "type": "string" }
+              }
+            }
+          },
+          "defaultType": {
+            "type": "string",
+            "description": "Type used when an unknown type is provided"
+          },
+          "docs": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      },
+      "HealthResponse": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string" },
+          "service": { "type": "string" },
+          "version": { "type": "string" },
+          "docs": { "type": "string", "format": "uri" },
+          "endpoints": {
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}
