@@ -190,6 +190,7 @@ See **[THEMES.md](THEMES.md)** for full descriptions and usage details.
 | OpenAPI spec | https://freeflowcharts.app/openapi.json |
 | Skill file | https://freeflowcharts.app/SKILL.md |
 | LLM info | https://freeflowcharts.app/llms.txt |
+| API repo (GitHub) | https://github.com/nerdfreakuser/freeflowcharts-api |
 
 ---
 

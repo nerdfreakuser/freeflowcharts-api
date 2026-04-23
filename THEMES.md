@@ -12,7 +12,7 @@ FreeFlowCharts supports 7 visual themes that change the entire look of exported 
 | `retro` | Dark amber gradient | Dotted borders, gold edges, warm tones | Georgia / serif |
 | `ocean` | Deep blue gradient | Glass-like low-opacity fills, thin dashed edges | Inter / system |
 | `brutalist` | White (`#ffffff`) | Solid black fills, sharp 0-radius corners, thick black edges, white text | Courier New / monospace |
-| `candy` | Pastel pink-purple-blue gradient | Bright saturated fills, thick white edges, rounded pills, white text | Inter / system |
+| `candy` | Deep indigo (`#441bda`) | Bright saturated fills, thick white edges, rounded pills, white text | Inter / system |
 
 ## How to Use
 
@@ -103,6 +103,6 @@ Bold and stark. White background with solid black node fills, sharp square corne
 ![Brutalist theme](examples/theme-previews/brutalist.png)
 
 ### Candy
-Playful and vibrant. Pastel pink-purple-blue gradient background with bright, fully saturated node fills. Thick white edges, large rounded corners, white text. Fun and colorful.
+Playful and vibrant. Deep indigo (`#441bda`) background with bright, fully saturated node fills. Thick white edges, large rounded corners, white text. Fun and colorful.
 
 ![Candy theme](examples/theme-previews/candy.png)
