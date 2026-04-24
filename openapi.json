@@ -36,6 +36,8 @@
                 "title": "User Signup Flow",
                 "description": "How new users register on our platform",
                 "createdBy": "My AI Agent",
+                "theme": "ocean",
+                "background": "#0c1222",
                 "nodes": [
                   { "id": "1", "type": "start", "label": "User visits site" },
                   { "id": "2", "type": "process", "label": "Click Sign Up" },
@@ -259,7 +261,7 @@
       "get": {
         "operationId": "exportSVG",
         "summary": "Export flowchart as SVG image",
-        "description": "Returns a vector SVG rendering of the flowchart with dark theme, colored nodes, labeled edges, and branding.",
+        "description": "Returns a vector SVG rendering of the flowchart with themed styling, colored nodes, labeled edges, and branding. Edge and text colors auto-adapt for contrast on light backgrounds.",
         "parameters": [
           {
             "name": "id",

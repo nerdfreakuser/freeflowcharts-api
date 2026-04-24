@@ -74,8 +74,8 @@ curl -X POST https://freeflowcharts.app/api/create-flowchart \
 | `nodes[].type` | string | No | Node type (default: `"process"`) — see [Node Types](NODE_TYPES.md) |
 | `nodes[].label` | string | Yes | Display label (max 200 chars) |
 | `nodes[].description` | string | No | Node description (max 500 chars) |
-| `nodes[].x` | number | No | X position (auto-layout if omitted) |
-| `nodes[].y` | number | No | Y position (auto-layout if omitted) |
+| `nodes[].x` | number | No | X position (if omitted, uses intelligent hierarchical tree layout via Dagre) |
+| `nodes[].y` | number | No | Y position (if omitted, uses intelligent hierarchical tree layout via Dagre) |
 | `edges` | array | Yes | Array of edge objects (0–200) |
 | `edges[].from` | string | Yes | Source node ID |
 | `edges[].to` | string | Yes | Target node ID |
@@ -135,7 +135,7 @@ curl "https://freeflowcharts.app/api/export/png?id=YOUR_SHARE_ID&theme=candy" -o
 
 | Status | Meaning |
 |--------|---------|
-| 400 | Missing or invalid fields |
+| 400 | Missing/invalid fields, duplicate node IDs, or dangling edge references |
 | 404 | Flowchart not found (export) |
 | 405 | Wrong HTTP method |
 | 429 | Rate limit exceeded (30/hr per IP) |
