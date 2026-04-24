@@ -41,6 +41,9 @@ If you want to add a code example for a new language:
 - Ensure the script is self-contained. It should demonstrate hitting the `POST /api/create-flowchart` endpoint, printing the URL, and ideally fetching one of the export formats (like PNG or SVG).
 - Keep external dependencies to a minimum if possible, or clearly document them in a comment at the top of the file.
 
+## Contact
+If you need direct assistance with the API or have a private inquiry (such as discussing rate limits), you can reach out directly to **support@freeflowcharts.app**.
+
 ## License
 
 By contributing to this repository, you agree that your contributions will be licensed under its MIT License.
