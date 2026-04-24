@@ -42,7 +42,7 @@ If you want to add a code example for a new language:
 - Keep external dependencies to a minimum if possible, or clearly document them in a comment at the top of the file.
 
 ## Contact
-If you need direct assistance with the API or have a private inquiry (such as discussing rate limits), you can reach out directly to **support@freeflowcharts.app**.
+If you need direct assistance with the API or have a private inquiry (such as discussing rate limits), you can reach out directly to **hello@imagey.ai**.
 
 ## License
 
