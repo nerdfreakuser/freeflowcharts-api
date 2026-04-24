@@ -1,10 +1,12 @@
 """
 Create a flowchart using the FreeFlowCharts API (Python).
-No API key required. Uses only the standard library.
+No API key required.
+
+Requires the `requests` library:
+pip install requests
 """
 
-import json
-import urllib.request
+import requests
 
 API_URL = "https://freeflowcharts.app/api/create-flowchart"
 
@@ -39,11 +41,11 @@ payload = {
     ],
 }
 
-data = json.dumps(payload).encode("utf-8")
-req = urllib.request.Request(API_URL, data=data, headers={"Content-Type": "application/json"})
+print("Sending POST request to create flowchart...")
+resp = requests.post(API_URL, json=payload)
+resp.raise_for_status()
 
-with urllib.request.urlopen(req) as resp:
-    result = json.loads(resp.read().decode("utf-8"))
+result = resp.json()
 
 print(f"Flowchart created!")
 print(f"  View: {result['url']}")
@@ -53,5 +55,12 @@ print(f"  Embed: {result['embed']}")
 # Export as PNG
 share_id = result["shareId"]
 png_url = f"https://freeflowcharts.app/api/export/png?id={share_id}"
-urllib.request.urlretrieve(png_url, "flowchart.png")
+print(f"Downloading PNG export from {png_url}...")
+
+png_resp = requests.get(png_url)
+png_resp.raise_for_status()
+
+with open("flowchart.png", "wb") as f:
+    f.write(png_resp.content)
+    
 print(f"  Saved: flowchart.png")
