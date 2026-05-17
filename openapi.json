@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "FreeFlowCharts API",
-    "description": "Free public API for creating interactive flowcharts programmatically. No API key required. Perfect for AI agents, chatbots, automation scripts, and developer tools.",
+    "description": "Free public API for creating interactive flowcharts, Venn diagrams, org charts, pie charts, and mind maps programmatically. No API key required. Perfect for AI agents, chatbots, automation scripts, and developer tools.",
     "version": "1.0.0",
     "contact": {
       "name": "FreeFlowCharts",
@@ -333,6 +333,231 @@
           "500": { "description": "PNG rendering failed — try SVG instead" }
         }
       }
+    },
+    "/api/create-venn": {
+      "post": {
+        "operationId": "createVenn",
+        "summary": "Create a Venn diagram and get a shareable link",
+        "description": "Creates a Venn diagram from a list of circles and optional labels. Returns a permanent shareable URL. No authentication required. Rate limited to 30 requests per hour per IP.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVennRequest"
+              },
+              "example": {
+                "title": "Skills Overlap",
+                "circles": [
+                  { "id": "A", "label": "Frontend", "color": "#3b82f6" },
+                  { "id": "B", "label": "Backend", "color": "#ef4444" }
+                ],
+                "labels": [
+                  { "id": "l1", "text": "React", "x": 260, "y": 300, "color": "#93c5fd", "region": "A" },
+                  { "id": "l2", "text": "Node.js", "x": 540, "y": 300, "color": "#fca5a5", "region": "B" },
+                  { "id": "l3", "text": "Full-Stack", "x": 400, "y": 300, "color": "#ffffff", "region": "AB" }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Venn diagram created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateVennResponse"
+                }
+              }
+            }
+          },
+          "400": { "description": "Validation error" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/api/export-venn/json": {
+      "get": {
+        "operationId": "exportVennJSON",
+        "summary": "Export Venn diagram as JSON",
+        "description": "Returns the Venn diagram data as structured JSON including circles, labels, and metadata.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "description": "The shareId of the Venn diagram",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "JSON export of the Venn diagram",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          },
+          "400": { "description": "Missing id parameter" },
+          "404": { "description": "Venn diagram not found" }
+        }
+      }
+    },
+    "/api/export-venn/svg": {
+      "get": {
+        "operationId": "exportVennSVG",
+        "summary": "Export Venn diagram as SVG",
+        "description": "Returns a rendered SVG image of the Venn diagram with circles, labels, grid, and branding.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "description": "The shareId of the Venn diagram",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "SVG image",
+            "content": { "image/svg+xml": { "schema": { "type": "string" } } }
+          },
+          "400": { "description": "Missing id parameter" },
+          "404": { "description": "Venn diagram not found" }
+        }
+      }
+    },
+    "/api/create-orgchart": {
+      "post": {
+        "operationId": "createOrgChart",
+        "summary": "Create an org chart and get a shareable link",
+        "description": "Creates a hierarchical org chart from a list of nodes with parent relationships. Returns a permanent shareable URL. Auto-layout tree structure. Rate limited to 30 requests per hour per IP.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateOrgChartRequest" },
+              "example": {
+                "title": "My Team",
+                "nodes": [
+                  { "id": "1", "label": "CEO", "title": "Chief Executive" },
+                  { "id": "2", "label": "CTO", "title": "Technology", "parentId": "1" },
+                  { "id": "3", "label": "CFO", "title": "Finance", "parentId": "1" }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Org chart created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenericCreateResponse" } } } },
+          "400": { "description": "Validation error" },
+          "429": { "description": "Rate limit exceeded" }
+        }
+      }
+    },
+    "/api/export-orgchart/json": {
+      "get": {
+        "operationId": "exportOrgChartJSON",
+        "summary": "Export org chart as JSON",
+        "parameters": [{ "name": "id", "in": "query", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "JSON export", "content": { "application/json": {} } }, "404": { "description": "Not found" } }
+      }
+    },
+    "/api/export-orgchart/svg": {
+      "get": {
+        "operationId": "exportOrgChartSVG",
+        "summary": "Export org chart as SVG",
+        "parameters": [{ "name": "id", "in": "query", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "SVG image", "content": { "image/svg+xml": {} } }, "404": { "description": "Not found" } }
+      }
+    },
+    "/api/create-piechart": {
+      "post": {
+        "operationId": "createPieChart",
+        "summary": "Create a pie or donut chart and get a shareable link",
+        "description": "Creates a pie chart from labeled value slices. Supports donut mode and legend. Auto-assigns colors. Rate limited to 30 requests per hour per IP.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreatePieChartRequest" },
+              "example": {
+                "title": "Market Share",
+                "slices": [
+                  { "label": "Product A", "value": 40 },
+                  { "label": "Product B", "value": 30 },
+                  { "label": "Other", "value": 30 }
+                ],
+                "donut": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Pie chart created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenericCreateResponse" } } } },
+          "400": { "description": "Validation error" },
+          "429": { "description": "Rate limit exceeded" }
+        }
+      }
+    },
+    "/api/export-piechart/json": {
+      "get": {
+        "operationId": "exportPieChartJSON",
+        "summary": "Export pie chart as JSON",
+        "parameters": [{ "name": "id", "in": "query", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "JSON export", "content": { "application/json": {} } }, "404": { "description": "Not found" } }
+      }
+    },
+    "/api/export-piechart/svg": {
+      "get": {
+        "operationId": "exportPieChartSVG",
+        "summary": "Export pie chart as SVG",
+        "parameters": [{ "name": "id", "in": "query", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "SVG image", "content": { "image/svg+xml": {} } }, "404": { "description": "Not found" } }
+      }
+    },
+    "/api/create-mindmap": {
+      "post": {
+        "operationId": "createMindMap",
+        "summary": "Create a mind map and get a shareable link",
+        "description": "Creates a radial mind map from a list of nodes with parent relationships. Auto radial layout. Rate limited to 30 requests per hour per IP.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateMindMapRequest" },
+              "example": {
+                "title": "Project Ideas",
+                "nodes": [
+                  { "id": "1", "label": "Main Topic" },
+                  { "id": "2", "label": "Branch A", "parentId": "1" },
+                  { "id": "3", "label": "Branch B", "parentId": "1" }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Mind map created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GenericCreateResponse" } } } },
+          "400": { "description": "Validation error" },
+          "429": { "description": "Rate limit exceeded" }
+        }
+      }
+    },
+    "/api/export-mindmap/json": {
+      "get": {
+        "operationId": "exportMindMapJSON",
+        "summary": "Export mind map as JSON",
+        "parameters": [{ "name": "id", "in": "query", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "JSON export", "content": { "application/json": {} } }, "404": { "description": "Not found" } }
+      }
+    },
+    "/api/export-mindmap/svg": {
+      "get": {
+        "operationId": "exportMindMapSVG",
+        "summary": "Export mind map as SVG",
+        "parameters": [{ "name": "id", "in": "query", "required": true, "schema": { "type": "string" } }],
+        "responses": { "200": { "description": "SVG image", "content": { "image/svg+xml": {} } }, "404": { "description": "Not found" } }
+      }
     }
   },
   "components": {
@@ -519,6 +744,163 @@
           "endpoints": {
             "type": "object",
             "additionalProperties": { "type": "string" }
+          }
+        }
+      },
+      "CreateVennRequest": {
+        "type": "object",
+        "required": ["title", "circles"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Venn diagram title"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000,
+            "description": "Optional description"
+          },
+          "createdBy": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Attribution — your agent or app name"
+          },
+          "circles": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": {
+              "type": "object",
+              "required": ["id", "label"],
+              "properties": {
+                "id": { "type": "string", "description": "Unique circle ID" },
+                "label": { "type": "string", "maxLength": 100, "description": "Circle label" },
+                "cx": { "type": "number", "description": "X center (auto if omitted)" },
+                "cy": { "type": "number", "description": "Y center (auto if omitted)" },
+                "r": { "type": "number", "minimum": 20, "maximum": 400, "description": "Radius" },
+                "color": { "type": "string", "description": "Hex color (auto if omitted)" },
+                "opacity": { "type": "number", "minimum": 0.05, "maximum": 1.0, "description": "Fill opacity (default: 0.35)" }
+              }
+            }
+          },
+          "labels": {
+            "type": "array",
+            "maxItems": 50,
+            "items": {
+              "type": "object",
+              "required": ["id", "text"],
+              "properties": {
+                "id": { "type": "string" },
+                "text": { "type": "string", "maxLength": 200 },
+                "x": { "type": "number" },
+                "y": { "type": "number" },
+                "fontSize": { "type": "number", "minimum": 8, "maximum": 48 },
+                "color": { "type": "string" },
+                "region": { "type": "string", "description": "Region hint, e.g. A, AB, ABC" }
+              }
+            }
+          },
+          "bgColor": {
+            "type": "string",
+            "description": "Background hex color (default: #06040d)"
+          }
+        }
+      },
+      "CreateVennResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "vennId": { "type": "string", "description": "Firestore document ID" },
+          "shareId": { "type": "string", "description": "Unique share identifier" },
+          "url": { "type": "string", "format": "uri", "description": "Shareable view URL" },
+          "embed": { "type": "string", "description": "HTML iframe embed code" },
+          "branding": { "type": "string" }
+        }
+      },
+      "GenericCreateResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "shareId": { "type": "string" },
+          "url": { "type": "string", "format": "uri" },
+          "embed": { "type": "string" }
+        }
+      },
+      "CreateOrgChartRequest": {
+        "type": "object",
+        "required": ["nodes"],
+        "properties": {
+          "title": { "type": "string", "maxLength": 200 },
+          "description": { "type": "string", "maxLength": 1000 },
+          "createdBy": { "type": "string", "maxLength": 100 },
+          "background": { "type": "string" },
+          "nodes": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "required": ["id", "label"],
+              "properties": {
+                "id": { "type": "string" },
+                "label": { "type": "string", "maxLength": 200, "description": "Person or role name" },
+                "title": { "type": "string", "maxLength": 200, "description": "Job title" },
+                "parentId": { "type": "string", "description": "Parent node ID (null for root)" },
+                "color": { "type": "string", "description": "Hex color" }
+              }
+            }
+          }
+        }
+      },
+      "CreatePieChartRequest": {
+        "type": "object",
+        "required": ["slices"],
+        "properties": {
+          "title": { "type": "string", "maxLength": 200 },
+          "description": { "type": "string", "maxLength": 1000 },
+          "createdBy": { "type": "string", "maxLength": 100 },
+          "background": { "type": "string" },
+          "donut": { "type": "boolean", "description": "Donut style (default: false)" },
+          "showLegend": { "type": "boolean", "description": "Show legend (default: true)" },
+          "slices": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 50,
+            "items": {
+              "type": "object",
+              "required": ["label", "value"],
+              "properties": {
+                "label": { "type": "string", "maxLength": 200 },
+                "value": { "type": "number", "minimum": 0 },
+                "color": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "CreateMindMapRequest": {
+        "type": "object",
+        "required": ["nodes"],
+        "properties": {
+          "title": { "type": "string", "maxLength": 200 },
+          "description": { "type": "string", "maxLength": 1000 },
+          "createdBy": { "type": "string", "maxLength": 100 },
+          "background": { "type": "string" },
+          "nodes": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "type": "object",
+              "required": ["id", "label"],
+              "properties": {
+                "id": { "type": "string" },
+                "label": { "type": "string", "maxLength": 200 },
+                "parentId": { "type": "string", "description": "Parent node ID" },
+                "color": { "type": "string" }
+              }
+            }
           }
         }
       }

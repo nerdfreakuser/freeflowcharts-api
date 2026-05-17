@@ -1,6 +1,6 @@
 # FreeFlowCharts API
 
-> **Free public API** for creating, exporting, and sharing interactive flowcharts. No API key required.
+> **Free public API** for creating, exporting, and sharing interactive flowcharts, Venn diagrams, org charts, pie charts, and mind maps. No API key required.
 
 **Live app:** [freeflowcharts.app](https://freeflowcharts.app)
 **API docs page:** [freeflowcharts.app/api-docs](https://freeflowcharts.app/api-docs)
@@ -50,6 +50,8 @@ curl -X POST https://freeflowcharts.app/api/create-flowchart \
 
 ## Endpoints
 
+### Flowchart
+
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `POST` | `/api/create-flowchart` | Create a flowchart and get a shareable link |
@@ -57,6 +59,43 @@ curl -X POST https://freeflowcharts.app/api/create-flowchart \
 | `GET` | `/api/export/mermaid?id=<shareId>` | Export as Mermaid syntax (`text/plain`) |
 | `GET` | `/api/export/svg?id=<shareId>` | Export as SVG image (`image/svg+xml`) |
 | `GET` | `/api/export/png?id=<shareId>` | Export as PNG image (`image/png`, 1600px wide) |
+
+### Venn Diagram
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/create-venn` | Create a Venn diagram and get a shareable link |
+| `GET` | `/api/export-venn/json?id=<shareId>` | Export as JSON |
+| `GET` | `/api/export-venn/svg?id=<shareId>` | Export as SVG |
+
+### Org Chart
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/create-orgchart` | Create an org chart (tree hierarchy) |
+| `GET` | `/api/export-orgchart/json?id=<shareId>` | Export as JSON |
+| `GET` | `/api/export-orgchart/svg?id=<shareId>` | Export as SVG |
+
+### Pie Chart
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/create-piechart` | Create a pie/donut chart |
+| `GET` | `/api/export-piechart/json?id=<shareId>` | Export as JSON |
+| `GET` | `/api/export-piechart/svg?id=<shareId>` | Export as SVG |
+
+### Mind Map
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/create-mindmap` | Create a mind map (radial layout) |
+| `GET` | `/api/export-mindmap/json?id=<shareId>` | Export as JSON |
+| `GET` | `/api/export-mindmap/svg?id=<shareId>` | Export as SVG |
+
+### Utility
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
 | `GET` | `/api/node-types` | List all 19 supported node types |
 | `GET` | `/api/health` | API status and endpoint listing |
 
@@ -168,6 +207,67 @@ All 7 themes applied to the same flowchart:
 | ![Candy](examples/theme-previews/candy.png) |
 
 See **[THEMES.md](THEMES.md)** for full descriptions and usage details.
+
+---
+
+## Org Chart — Quick Example
+
+```bash
+curl -X POST https://freeflowcharts.app/api/create-orgchart \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Engineering",
+    "nodes": [
+      { "id": "1", "label": "VP Engineering", "title": "Vice President" },
+      { "id": "2", "label": "Frontend Lead", "parentId": "1" },
+      { "id": "3", "label": "Backend Lead", "parentId": "1" },
+      { "id": "4", "label": "Dev A", "parentId": "2" },
+      { "id": "5", "label": "Dev B", "parentId": "3" }
+    ]
+  }'
+```
+
+Max 100 nodes. Auto-layout tree. Colors assigned by depth.
+
+---
+
+## Pie Chart — Quick Example
+
+```bash
+curl -X POST https://freeflowcharts.app/api/create-piechart \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Market Share",
+    "slices": [
+      { "label": "Product A", "value": 40 },
+      { "label": "Product B", "value": 30 },
+      { "label": "Other", "value": 30 }
+    ],
+    "donut": true
+  }'
+```
+
+Max 50 slices. Optional donut mode. Colors auto-assigned.
+
+---
+
+## Mind Map — Quick Example
+
+```bash
+curl -X POST https://freeflowcharts.app/api/create-mindmap \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Project Ideas",
+    "nodes": [
+      { "id": "1", "label": "Main Topic" },
+      { "id": "2", "label": "Branch A", "parentId": "1" },
+      { "id": "3", "label": "Branch B", "parentId": "1" },
+      { "id": "4", "label": "Sub-idea", "parentId": "2" }
+    ]
+  }'
+```
+
+Max 100 nodes. Auto radial layout. Colors assigned by branch.
 
 ---
 
