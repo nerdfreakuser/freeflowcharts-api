@@ -640,11 +640,11 @@
           },
           "x": {
             "type": "number",
-            "description": "X position in pixels. If omitted, nodes are auto-laid out in a grid."
+            "description": "X position in pixels. If x/y are omitted on every node, all nodes are auto-laid out as a hierarchical top-to-bottom tree via Dagre. If any node has explicit coordinates, auto-layout is skipped entirely and unpositioned nodes default to 0."
           },
           "y": {
             "type": "number",
-            "description": "Y position in pixels. If omitted, nodes are auto-laid out in a grid."
+            "description": "Y position in pixels. If x/y are omitted on every node, all nodes are auto-laid out as a hierarchical top-to-bottom tree via Dagre. If any node has explicit coordinates, auto-layout is skipped entirely and unpositioned nodes default to 0."
           }
         }
       },
